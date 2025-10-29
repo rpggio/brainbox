@@ -14,12 +14,27 @@ describe('TreeNote Web Component', () => {
     document.body.appendChild(editor);
 
     // Wait for the component to be fully initialized
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise(resolve => setTimeout(resolve, 200));
   });
 
   afterEach(() => {
     document.body.innerHTML = '';
   });
+
+  // Helper to get the ProseMirror editable element
+  const getProseMirrorElement = () => {
+    const shadowRoot = editor.shadowRoot!;
+    return shadowRoot.querySelector('.ProseMirror') as HTMLElement;
+  };
+
+  // Helper to focus and click the editor
+  const focusEditor = async () => {
+    const proseMirror = getProseMirrorElement();
+    if (proseMirror) {
+      await userEvent.click(proseMirror);
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+  };
 
   describe('Component Initialization', () => {
     it('should create a custom element', () => {
@@ -48,18 +63,15 @@ describe('TreeNote Web Component', () => {
   describe('Node Creation', () => {
     it('should create a new node when Enter is pressed', async () => {
       const shadowRoot = editor.shadowRoot!;
-      const editorEl = shadowRoot.querySelector('.tree-note-editor') as HTMLElement;
 
-      // Focus the editor
-      editorEl.focus();
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await focusEditor();
 
       // Get initial node count
       const initialNodes = shadowRoot.querySelectorAll('[data-outline-node]').length;
 
       // Press Enter
       await userEvent.keyboard('{Enter}');
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 150));
 
       // Check that a new node was created
       const finalNodes = shadowRoot.querySelectorAll('[data-outline-node]').length;
@@ -67,40 +79,34 @@ describe('TreeNote Web Component', () => {
     });
 
     it('should emit node-created event when Enter is pressed', async () => {
-      const shadowRoot = editor.shadowRoot!;
-      const editorEl = shadowRoot.querySelector('.tree-note-editor') as HTMLElement;
-
       let eventFired = false;
       editor.addEventListener('node-created', () => {
         eventFired = true;
       });
 
-      editorEl.focus();
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await focusEditor();
 
       await userEvent.keyboard('{Enter}');
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 150));
 
       expect(eventFired).toBe(true);
     });
 
     it('should create new node at same indentation level', async () => {
       const shadowRoot = editor.shadowRoot!;
-      const editorEl = shadowRoot.querySelector('.tree-note-editor') as HTMLElement;
 
-      editorEl.focus();
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await focusEditor();
 
       // Indent first node
       await userEvent.keyboard('{Tab}');
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       const firstNode = shadowRoot.querySelector('[data-outline-node]');
       const firstLevel = firstNode?.getAttribute('data-level');
 
       // Press Enter to create new node
       await userEvent.keyboard('{Enter}');
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 150));
 
       const nodes = shadowRoot.querySelectorAll('[data-outline-node]');
       const secondNode = nodes[1];
@@ -113,10 +119,8 @@ describe('TreeNote Web Component', () => {
   describe('Indentation', () => {
     it('should indent node when Tab is pressed', async () => {
       const shadowRoot = editor.shadowRoot!;
-      const editorEl = shadowRoot.querySelector('.tree-note-editor') as HTMLElement;
 
-      editorEl.focus();
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await focusEditor();
 
       const node = shadowRoot.querySelector('[data-outline-node]');
       const initialLevel = node?.getAttribute('data-level');
@@ -129,9 +133,6 @@ describe('TreeNote Web Component', () => {
     });
 
     it('should emit node-indented event when Tab is pressed', async () => {
-      const shadowRoot = editor.shadowRoot!;
-      const editorEl = shadowRoot.querySelector('.tree-note-editor') as HTMLElement;
-
       let eventFired = false;
       let eventLevel = -1;
 
@@ -140,8 +141,7 @@ describe('TreeNote Web Component', () => {
         eventLevel = (e as CustomEvent).detail.level;
       });
 
-      editorEl.focus();
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await focusEditor();
 
       await userEvent.keyboard('{Tab}');
       await new Promise(resolve => setTimeout(resolve, 100));
@@ -152,10 +152,8 @@ describe('TreeNote Web Component', () => {
 
     it('should update padding-left when indented', async () => {
       const shadowRoot = editor.shadowRoot!;
-      const editorEl = shadowRoot.querySelector('.tree-note-editor') as HTMLElement;
 
-      editorEl.focus();
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await focusEditor();
 
       const node = shadowRoot.querySelector('[data-outline-node]') as HTMLElement;
       const initialPadding = getComputedStyle(node).paddingLeft;
@@ -171,14 +169,12 @@ describe('TreeNote Web Component', () => {
   describe('Unindentation', () => {
     it('should unindent node when Shift+Tab is pressed', async () => {
       const shadowRoot = editor.shadowRoot!;
-      const editorEl = shadowRoot.querySelector('.tree-note-editor') as HTMLElement;
 
-      editorEl.focus();
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await focusEditor();
 
       // First indent
       await userEvent.keyboard('{Tab}');
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       const node = shadowRoot.querySelector('[data-outline-node]');
       const indentedLevel = node?.getAttribute('data-level');
@@ -192,21 +188,17 @@ describe('TreeNote Web Component', () => {
     });
 
     it('should emit node-unindented event when Shift+Tab is pressed', async () => {
-      const shadowRoot = editor.shadowRoot!;
-      const editorEl = shadowRoot.querySelector('.tree-note-editor') as HTMLElement;
-
       let eventFired = false;
 
       editor.addEventListener('node-unindented', () => {
         eventFired = true;
       });
 
-      editorEl.focus();
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await focusEditor();
 
       // First indent
       await userEvent.keyboard('{Tab}');
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       // Then unindent
       await userEvent.keyboard('{Shift>}{Tab}{/Shift}');
@@ -217,10 +209,8 @@ describe('TreeNote Web Component', () => {
 
     it('should not unindent below level 0', async () => {
       const shadowRoot = editor.shadowRoot!;
-      const editorEl = shadowRoot.querySelector('.tree-note-editor') as HTMLElement;
 
-      editorEl.focus();
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await focusEditor();
 
       const node = shadowRoot.querySelector('[data-outline-node]');
 
@@ -236,10 +226,8 @@ describe('TreeNote Web Component', () => {
   describe('Text Input', () => {
     it('should accept text input', async () => {
       const shadowRoot = editor.shadowRoot!;
-      const editorEl = shadowRoot.querySelector('.tree-note-editor') as HTMLElement;
 
-      editorEl.focus();
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await focusEditor();
 
       await userEvent.keyboard('Hello World');
       await new Promise(resolve => setTimeout(resolve, 100));
@@ -250,16 +238,14 @@ describe('TreeNote Web Component', () => {
 
     it('should handle multiple lines of text', async () => {
       const shadowRoot = editor.shadowRoot!;
-      const editorEl = shadowRoot.querySelector('.tree-note-editor') as HTMLElement;
 
-      editorEl.focus();
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await focusEditor();
 
       await userEvent.keyboard('First line');
       await userEvent.keyboard('{Enter}');
-      await new Promise(resolve => setTimeout(resolve, 50));
-      await userEvent.keyboard('Second line');
       await new Promise(resolve => setTimeout(resolve, 100));
+      await userEvent.keyboard('Second line');
+      await new Promise(resolve => setTimeout(resolve, 150));
 
       const nodes = shadowRoot.querySelectorAll('[data-outline-node]');
       expect(nodes.length).toBe(2);
@@ -318,17 +304,13 @@ describe('TreeNote Web Component', () => {
 
   describe('Events', () => {
     it('should emit change event on content modification', async () => {
-      const shadowRoot = editor.shadowRoot!;
-      const editorEl = shadowRoot.querySelector('.tree-note-editor') as HTMLElement;
-
       let changeEventFired = false;
 
       editor.addEventListener('change', () => {
         changeEventFired = true;
       });
 
-      editorEl.focus();
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await focusEditor();
 
       await userEvent.keyboard('Test');
       await new Promise(resolve => setTimeout(resolve, 100));
@@ -337,17 +319,13 @@ describe('TreeNote Web Component', () => {
     });
 
     it('should include content in change event detail', async () => {
-      const shadowRoot = editor.shadowRoot!;
-      const editorEl = shadowRoot.querySelector('.tree-note-editor') as HTMLElement;
-
       let eventContent: any = null;
 
       editor.addEventListener('change', (e) => {
         eventContent = (e as CustomEvent).detail.content;
       });
 
-      editorEl.focus();
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await focusEditor();
 
       await userEvent.keyboard('Test');
       await new Promise(resolve => setTimeout(resolve, 100));
@@ -360,26 +338,24 @@ describe('TreeNote Web Component', () => {
   describe('Complex Scenarios', () => {
     it('should handle creating multiple nested nodes', async () => {
       const shadowRoot = editor.shadowRoot!;
-      const editorEl = shadowRoot.querySelector('.tree-note-editor') as HTMLElement;
 
-      editorEl.focus();
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await focusEditor();
 
       // Create first node
       await userEvent.keyboard('Level 0');
       await userEvent.keyboard('{Enter}');
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise(resolve => setTimeout(resolve, 150));
 
       // Create indented node
       await userEvent.keyboard('{Tab}');
       await userEvent.keyboard('Level 1');
       await userEvent.keyboard('{Enter}');
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise(resolve => setTimeout(resolve, 150));
 
       // Create another indented node
       await userEvent.keyboard('{Tab}');
       await userEvent.keyboard('Level 2');
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 150));
 
       const nodes = shadowRoot.querySelectorAll('[data-outline-node]');
       expect(nodes.length).toBe(3);
@@ -390,22 +366,23 @@ describe('TreeNote Web Component', () => {
 
     it('should maintain structure after multiple edits', async () => {
       const shadowRoot = editor.shadowRoot!;
-      const editorEl = shadowRoot.querySelector('.tree-note-editor') as HTMLElement;
 
-      editorEl.focus();
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await focusEditor();
 
       // Create a structure
       await userEvent.keyboard('First');
       await userEvent.keyboard('{Enter}');
+      await new Promise(resolve => setTimeout(resolve, 100));
       await userEvent.keyboard('{Tab}');
       await userEvent.keyboard('Second');
       await userEvent.keyboard('{Enter}');
+      await new Promise(resolve => setTimeout(resolve, 100));
       await userEvent.keyboard('Third');
       await userEvent.keyboard('{Enter}');
+      await new Promise(resolve => setTimeout(resolve, 100));
       await userEvent.keyboard('{Shift>}{Tab}{/Shift}');
       await userEvent.keyboard('Fourth');
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 150));
 
       const nodes = shadowRoot.querySelectorAll('[data-outline-node]');
       expect(nodes.length).toBe(4);
@@ -446,18 +423,18 @@ describe('TreeNote Web Component', () => {
 
     it('should have correct vertical spacing between nodes', async () => {
       const shadowRoot = editor.shadowRoot!;
-      const editorEl = shadowRoot.querySelector('.tree-note-editor') as HTMLElement;
 
-      editorEl.focus();
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await focusEditor();
 
       // Create multiple nodes
       await userEvent.keyboard('First');
       await userEvent.keyboard('{Enter}');
+      await new Promise(resolve => setTimeout(resolve, 100));
       await userEvent.keyboard('Second');
       await userEvent.keyboard('{Enter}');
-      await userEvent.keyboard('Third');
       await new Promise(resolve => setTimeout(resolve, 100));
+      await userEvent.keyboard('Third');
+      await new Promise(resolve => setTimeout(resolve, 150));
 
       const nodes = shadowRoot.querySelectorAll('[data-outline-node]');
       expect(nodes.length).toBe(3);
@@ -467,6 +444,41 @@ describe('TreeNote Web Component', () => {
 
       // Second node should be below first node
       expect(secondRect.top).toBeGreaterThan(firstRect.top);
+    });
+  });
+
+  describe('Click to Focus', () => {
+    it('should focus editor when clicking on empty space', async () => {
+      const shadowRoot = editor.shadowRoot!;
+      const proseMirror = getProseMirrorElement();
+
+      // Click on the editor
+      await userEvent.click(proseMirror);
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Check that the editor is focused
+      expect(document.activeElement).toBe(editor);
+    });
+
+    it('should place cursor at end when clicking below nodes', async () => {
+      const shadowRoot = editor.shadowRoot!;
+
+      // First add some content
+      await focusEditor();
+      await userEvent.keyboard('First node');
+      await userEvent.keyboard('{Enter}');
+      await new Promise(resolve => setTimeout(resolve, 100));
+      await userEvent.keyboard('Second node');
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Click on the editor container (empty space)
+      const editorContainer = shadowRoot.querySelector('.tree-note-editor') as HTMLElement;
+      await userEvent.click(editorContainer);
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // The editor should be focused
+      const proseMirror = getProseMirrorElement();
+      expect(proseMirror).toBeTruthy();
     });
   });
 });

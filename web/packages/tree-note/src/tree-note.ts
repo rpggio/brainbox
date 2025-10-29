@@ -230,6 +230,40 @@ export class TreeNoteElement extends HTMLElement {
         detail: (e as CustomEvent).detail
       }));
     });
+
+    // Handle clicks on empty space to create/focus nodes
+    this.editorContainer.addEventListener('click', (e) => {
+      if (!this.editor) return;
+
+      const target = e.target as HTMLElement;
+
+      // If clicking directly on the editor container (empty space), focus the last node
+      if (target === this.editorContainer || target.classList.contains('ProseMirror')) {
+        // Get the last position in the document
+        const { doc } = this.editor.state;
+        const lastPos = doc.content.size;
+
+        // Focus at the end of the document
+        this.editor.commands.focus(lastPos);
+
+        // If clicking below all nodes, ensure there's a node to focus
+        if (this.editorContainer) {
+          const clickY = e.clientY;
+          const editorRect = this.editorContainer.getBoundingClientRect();
+          const nodes = this.editorContainer.querySelectorAll('[data-outline-node]');
+
+          if (nodes.length > 0) {
+            const lastNode = nodes[nodes.length - 1] as HTMLElement;
+            const lastNodeRect = lastNode.getBoundingClientRect();
+
+            // If click is below the last node, ensure cursor is at the end
+            if (clickY > lastNodeRect.bottom) {
+              this.editor.commands.focus('end');
+            }
+          }
+        }
+      }
+    });
   }
 
   // Public API
