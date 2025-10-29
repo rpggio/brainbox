@@ -122,6 +122,10 @@ describe('TreeNote Web Component', () => {
 
       await focusEditor();
 
+      // Add some text first to ensure cursor is in the node
+      await userEvent.keyboard('test');
+      await new Promise(resolve => setTimeout(resolve, 100));
+
       const node = shadowRoot.querySelector('[data-outline-node]');
       const initialLevel = node?.getAttribute('data-level');
 
@@ -143,6 +147,10 @@ describe('TreeNote Web Component', () => {
 
       await focusEditor();
 
+      // Add some text first to ensure cursor is in the node
+      await userEvent.keyboard('test');
+      await new Promise(resolve => setTimeout(resolve, 100));
+
       await userEvent.keyboard('{Tab}');
       await new Promise(resolve => setTimeout(resolve, 100));
 
@@ -154,6 +162,10 @@ describe('TreeNote Web Component', () => {
       const shadowRoot = editor.shadowRoot!;
 
       await focusEditor();
+
+      // Add some text first to ensure cursor is in the node
+      await userEvent.keyboard('test');
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       const node = shadowRoot.querySelector('[data-outline-node]') as HTMLElement;
       const initialPadding = getComputedStyle(node).paddingLeft;
@@ -171,6 +183,10 @@ describe('TreeNote Web Component', () => {
       const shadowRoot = editor.shadowRoot!;
 
       await focusEditor();
+
+      // Add some text first to ensure cursor is in the node
+      await userEvent.keyboard('test');
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       // First indent
       await userEvent.keyboard('{Tab}');
@@ -196,6 +212,10 @@ describe('TreeNote Web Component', () => {
 
       await focusEditor();
 
+      // Add some text first to ensure cursor is in the node
+      await userEvent.keyboard('test');
+      await new Promise(resolve => setTimeout(resolve, 100));
+
       // First indent
       await userEvent.keyboard('{Tab}');
       await new Promise(resolve => setTimeout(resolve, 100));
@@ -211,6 +231,10 @@ describe('TreeNote Web Component', () => {
       const shadowRoot = editor.shadowRoot!;
 
       await focusEditor();
+
+      // Add some text first to ensure cursor is in the node
+      await userEvent.keyboard('test');
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       const node = shadowRoot.querySelector('[data-outline-node]');
 

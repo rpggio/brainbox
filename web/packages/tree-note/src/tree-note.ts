@@ -36,6 +36,7 @@ export class TreeNoteElement extends HTMLElement {
           width: 100%;
           height: 100%;
           outline: none;
+          overflow-y: auto;
         }
 
         .tree-note-editor [data-outline-node] {
@@ -236,6 +237,12 @@ export class TreeNoteElement extends HTMLElement {
       if (!this.editor) return;
 
       const target = e.target as HTMLElement;
+
+      // Don't interfere if there's a text selection
+      const selection = window.getSelection();
+      if (selection && !selection.isCollapsed) {
+        return;
+      }
 
       // If clicking directly on the editor container (empty space), focus the last node
       if (target === this.editorContainer || target.classList.contains('ProseMirror')) {
