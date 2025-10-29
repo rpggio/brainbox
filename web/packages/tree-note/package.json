@@ -1,0 +1,39 @@
+{
+  "name": "@brainbox/tree-note",
+  "version": "0.1.0",
+  "description": "TipTap-based outliner web component",
+  "type": "module",
+  "main": "./dist/tree-note.js",
+  "module": "./dist/tree-note.js",
+  "types": "./dist/tree-note.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/tree-note.js",
+      "types": "./dist/tree-note.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && tsc --emitDeclarationOnly",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@tiptap/core": "^2.1.13",
+    "@tiptap/pm": "^2.1.13",
+    "@tiptap/starter-kit": "^2.1.13"
+  },
+  "devDependencies": {
+    "@vitest/browser": "^2.1.0",
+    "@vitest/ui": "^2.1.0",
+    "playwright": "^1.40.0",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.8",
+    "vite-plugin-dts": "^3.6.4",
+    "vitest": "^2.1.0"
+  }
+}
