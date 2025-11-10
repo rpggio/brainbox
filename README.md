@@ -9,5 +9,3 @@ Brainbox is a platform for vibe-coding personalized applications.
 ## Backend
 
 A self-managing data platform is provided, which supports data validation and schema migration capabilities for AI to use.
-
-
