@@ -11,7 +11,7 @@ export class NoteItem extends LitElement {
   @property({ type: Object }) note?: RecordModel;
   @property({ type: Number }) indent = 0;
   @state() private editor?: Editor;
-  @state() private children: RecordModel[] = [];
+  @state() private childNotes: RecordModel[] = [];
 
   static styles = css`
     :host {
@@ -160,9 +160,9 @@ export class NoteItem extends LitElement {
         <div class="bullet"></div>
         <div class="editor-container"></div>
       </div>
-      ${this.children.length > 0 ? html`
+      ${this.childNotes.length > 0 ? html`
         <div class="children">
-          ${this.children.map(child => html`
+          ${this.childNotes.map(child => html`
             <note-item .note=${child} .indent=${this.indent + 1}></note-item>
           `)}
         </div>

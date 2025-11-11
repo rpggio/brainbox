@@ -70,16 +70,16 @@ export class NotesApp extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    this.addEventListener('content-changed', this.handleContentChanged as EventListener);
-    this.addEventListener('create-child', this.handleCreateChild as EventListener);
-    this.addEventListener('create-sibling', this.handleCreateSibling as EventListener);
+    this.addEventListener('content-changed', this.handleContentChanged);
+    this.addEventListener('create-child', this.handleCreateChild);
+    this.addEventListener('create-sibling', this.handleCreateSibling);
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    this.removeEventListener('content-changed', this.handleContentChanged as EventListener);
-    this.removeEventListener('create-child', this.handleCreateChild as EventListener);
-    this.removeEventListener('create-sibling', this.handleCreateSibling as EventListener);
+    this.removeEventListener('content-changed', this.handleContentChanged);
+    this.removeEventListener('create-child', this.handleCreateChild);
+    this.removeEventListener('create-sibling', this.handleCreateSibling);
   }
 
   private async loadNotes() {
@@ -115,8 +115,8 @@ export class NotesApp extends LitElement {
     this.requestUpdate();
   }
 
-  private handleContentChanged = async (e: CustomEvent) => {
-    const { id, content } = e.detail;
+  private handleContentChanged = async (e: Event) => {
+    const { id, content } = (e as CustomEvent).detail;
     try {
       await this.pb.collection('notes').update(id, { content });
     } catch (error) {
@@ -124,8 +124,8 @@ export class NotesApp extends LitElement {
     }
   };
 
-  private handleCreateChild = async (e: CustomEvent) => {
-    const { parentId } = e.detail;
+  private handleCreateChild = async (e: Event) => {
+    const { parentId } = (e as CustomEvent).detail;
     const siblings = this.noteTree.get(parentId) || [];
     const order = siblings.length;
 
@@ -147,8 +147,8 @@ export class NotesApp extends LitElement {
     }
   };
 
-  private handleCreateSibling = async (e: CustomEvent) => {
-    const { afterId, parentId } = e.detail;
+  private handleCreateSibling = async (e: Event) => {
+    const { afterId, parentId } = (e as CustomEvent).detail;
 
     const siblings = this.noteTree.get(parentId || 'root') || [];
     const afterIndex = siblings.findIndex(n => n.id === afterId);
