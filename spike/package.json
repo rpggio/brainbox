@@ -1,0 +1,28 @@
+{
+  "name": "pocketbase-notes-spike",
+  "version": "1.0.0",
+  "description": "Technical spike: Notes app with Pocketbase and web components",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@shoelace-style/shoelace": "^2.15.1",
+    "@tiptap/core": "^2.6.6",
+    "@tiptap/extension-bullet-list": "^2.6.6",
+    "@tiptap/extension-document": "^2.6.6",
+    "@tiptap/extension-list-item": "^2.6.6",
+    "@tiptap/extension-paragraph": "^2.6.6",
+    "@tiptap/extension-text": "^2.6.6",
+    "@tiptap/pm": "^2.6.6",
+    "lit": "^3.1.0",
+    "pocketbase": "^0.21.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.5",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.12"
+  }
+}
